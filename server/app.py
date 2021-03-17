@@ -1,11 +1,12 @@
-from flask import Flask, jsonify,request,make_response
+import os
+
+
+from flask import Flask,request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_jwt_extended import JWTManager
 
 import config.index as cfg
-import controllers.signup as sign_up
-import controllers.signin as sign_in
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -14,84 +15,63 @@ CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI']=cfg.dbConfig
 
+app.config['SECRET_KEY']=os.getenv('SECRET_KEY','my_precious')
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+
+app.config['JWT_SECRET_KEY'] = 'Dude!WhyShouldYouEncryptIt'
+
+app.config['JWT_BLACKLIST_ENABLED'] = True
+
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+
+
 db=SQLAlchemy(app)
+jwt=JWTManager(app)
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 
-#----------------------------CREATE TABLES---------------------------------
-class Usertest(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    birthday=db.Column(db.DateTime())
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti=decrypted_token['jti']
 
-    def __init__(self,username,email,birthday):
-        self.username=username
-        self.email=email
-        self.birthday=birthday
+    return models.RevokenTokenModel.is_jti_blacklisted(jti)
 
-    def __repr__(self):
-        return f'<users {self.id}:{self.email}; {self.username}>'
+import models.models as models
+import resourses
 
 
-class Login(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    email=db.Column(db.String(100),unique=True,nullable=False)
-    hash=db.Column(db.String(200),nullable=False)
-    datereg=db.Column(db.DateTime,nullable=False)
-    lastlog=db.Column(db.DateTime,nullable=False)
-    entries=db.Column(db.Integer)
-
-    def __init__(self,email,hash,datereg,lastlog,entries):
-        self.email=email
-        self.hash=u'{}'.format(hash)
-        self.datereg=datereg
-        self.lastlog=lastlog
-        self.entries=entries
-
-    def __repr__(self):
-        return f'<login, user email:{self.hash}>'
-
-
-
-class Users(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    login = db.Column(db.String(100), unique=True, nullable=False)
-    birthday=db.Column(db.DateTime())
-
-    def __init__(self,login,email,birthday):
-        self.login=login
-        self.email=email
-        self.birthday=birthday
-
-    def __repr__(self):
-        return f'<users {self.id}:{self.email}; {self.login}>'
-
-
-
-
-
-#----------------------------------GET----------------------------------
 @app.route('/api', methods=['GET'])
 def initial():
-    print(Users.query.filter(Users.id==1).all())
-    return jsonify('hello')
+    return resourses.initial()
 
+@app.route('/api/user/<login>', methods=['GET', 'POST'])
+def user_by_id(login):
+    return resourses.user_by_id(login)
 
-
-#---------------------------SIGN_IN\SIGN_UP------------------------------
-@app.route('/api/auth/signup',methods=['GET','POST'])
+@app.route('/api/auth/signup', methods=['GET', 'POST'])
 def signup():
-    if(request.method=='POST'):
-        return sign_up.signUp(Users,Login,request,make_response,db)
+    return resourses.signup()
 
-@app.route('/api/auth/signin',methods=['GET','POST'])
+@app.route('/api/auth/signin', methods=['GET', 'POST'])
 def signin():
-    if(request.method=='POST'):
-        return sign_in.sign_in(Login,request,make_response,db)
+    return resourses.signin()
 
 
+@app.route('/api/logout/access',methods=['GET','POST'])
+def log_access():
+    resourses.log_acces()
 
+@app.route('/api/logout/refresh',methods=['GET','POST'])
+def log_refresh():
+    resourses.log_refresh()
+
+@app.route('/api/token/refresh',methods=['GET','POST'])
+def token_refresh():
+    resourses.token_refresh()
 
 if __name__ == '__main__':
     app.run(debug=True)

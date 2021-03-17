@@ -1,0 +1,102 @@
+<template>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <div class="container d-flex justify-content-between">
+      <b-navbar toggleable="lg">
+        <b-navbar-brand href="#"
+          ><router-link class="navbar-brand d-flex" :to="{ path: '/library' }">
+            <img
+              width="50px"
+              src="../assets/images/brainbook.svg"
+              class="navbar-brand-img"
+              alt="logo"
+            />
+            <p class="header__title">
+              BrainLibrary
+            </p>
+          </router-link></b-navbar-brand
+        >
+
+        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+        <b-collapse id="nav-collapse" is-nav>
+          <b-navbar-nav class="ml-auto">
+            <b-nav-item v-for="(book, index) in buttons" :key="book + index">
+              <router-link :to="{ name: book.name }" class="button__link">{{
+                book.text
+              }}</router-link>
+            </b-nav-item>
+          </b-navbar-nav>
+        </b-collapse>
+      </b-navbar>
+    </div>
+  </nav>
+</template>
+
+<script>
+export default {
+  name: "headerComponent",
+  data() {
+    return {
+      buttons: [
+        {
+          name: "profilePage",
+          text: "Profile"
+        },
+        {
+          name: "libraryPage",
+          text: "Library"
+        },
+        {
+          name: "booksPage",
+          text: "My books"
+        },
+        {
+          name: "downloadPage",
+          text: "Download"
+        },
+
+        {
+          name: "signInPage",
+          text: "Logout"
+        }
+      ]
+    };
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.header {
+  &__title {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.navbar-expand-lg {
+  min-width: 100%;
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: flex-end;
+}
+
+#nav-collapse {
+  text-decoration: none;
+  color: black;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.button__link {
+  text-decoration: none;
+  color: black;
+  &:hover {
+    text-decoration: none;
+    box-shadow: 0 2px black;
+  }
+}
+</style>
