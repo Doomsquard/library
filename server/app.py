@@ -1,10 +1,11 @@
 import os
 
 
-from flask import Flask,request
+from flask import Flask, request, make_response, render_template, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_raw_jwt, jwt_refresh_token_required, jwt_required, get_jwt_identity, \
+    create_access_token
 
 import config.index as cfg
 
@@ -37,12 +38,26 @@ def create_tables():
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti=decrypted_token['jti']
-
-    return models.RevokenTokenModel.is_jti_blacklisted(jti)
+    return models.Revokedtokenmodel.is_jti_blacklisted(jti)
 
 import models.models as models
 import resourses
 
+@app.route('/getUsers/<email>',methods=['GET'])
+def getUser(email):
+    users=models.Users.query.filter(models.Users.email==email).first()
+    userLogin=models.Login.query.filter(models.Login.email==email).first()
+    datereg=userLogin.datereg,
+    entries=userLogin.entries
+    lastlog=userLogin.lastlog
+    login=users.login
+    birthday=users.birthday
+    return jsonify({"lastlog":lastlog,
+                    'datereg':datereg[0],
+                    'entries':entries,
+                    'email':users.email,
+                    'login':login,
+                    'birthday':birthday})
 
 @app.route('/api', methods=['GET'])
 def initial():
@@ -61,17 +76,54 @@ def signin():
     return resourses.signin()
 
 
+
+
+
+
+#-------tokens api--------------------
 @app.route('/api/logout/access',methods=['GET','POST'])
-def log_access():
-    resourses.log_acces()
+@jwt_required
+def post():
+    jti = get_raw_jwt()['jti']
+
+    try:
+        revoked_token = models.Revokedtokenmodel(jti=jti)
+
+        revoked_token.add()
+
+        return make_response({'message': 'Acces token has been revoked'}, 200)
+
+    except:
+        return make_response({'message': 'Something went wrong'}, 500)
+
+
+
+
+
 
 @app.route('/api/logout/refresh',methods=['GET','POST'])
-def log_refresh():
-    resourses.log_refresh()
+@jwt_refresh_token_required
+def logoutRefresh():
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = models.Revokedtokenmodel(jti=jti)
+            revoked_token.add()
+            return make_response({'message': 'Acces token has been revoked'}, 200)
+
+        except:
+            return make_response({'message': 'Something went wrong'}, 500)
+
+
 
 @app.route('/api/token/refresh',methods=['GET','POST'])
-def token_refresh():
-    resourses.token_refresh()
+@jwt_refresh_token_required
+def refreshToken():
+        current_user = get_jwt_identity()
+        print(current_user)
+        access_token = create_access_token(identity=current_user)
+
+        return {'access_token': access_token}
+
 
 if __name__ == '__main__':
     app.run(debug=True)

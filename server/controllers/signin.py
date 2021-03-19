@@ -22,7 +22,7 @@ def sign_in(Login,request,make_response,db):
         db.session.commit()
         access_token = create_access_token(identity=email)
         refresh_token = create_refresh_token(identity=email)
-        return make_response({"message": f'Пользователь {email} вошел в систему',
+        return make_response({"user":email,
                               "access_token": access_token,
                               "refresh_token": refresh_token}, 200)
     else:

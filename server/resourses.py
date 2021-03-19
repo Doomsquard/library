@@ -49,45 +49,5 @@ def signin():
         return sign_in.sign_in(models.Login, request, make_response, db)
 
 
-def log_acces():
-    if request.method == 'POST':
-        @jwt_required
-        def post():
-            jti = get_raw_jwt()['jti']
 
-            try:
-                revoked_token = models.RevokedTokenModel(jti=jti)
 
-                revoked_token.add()
-
-                return make_response({'message': 'Acces token has been revoked'}, 200)
-
-            except:
-                return make_response({'message': 'Something went wrong'}, 500)
-        post()
-
-def log_refresh():
-    @jwt_refresh_token_required
-    def post():
-        jti = get_raw_jwt()['jti']
-
-        try:
-            revoked_token = models.RevokedTokenModel(jti=jti)
-
-            revoked_token.add()
-
-            return make_response({'message': 'Acces token has been revoked'}, 200)
-
-        except:
-            return make_response({'message': 'Something went wrong'}, 500)
-    post()
-
-def token_refresh():
-    @jwt_refresh_token_required
-    def post():
-        current_user = get_jwt_identity()
-        print(current_user)
-        access_token = create_access_token(identity=current_user)
-
-        return {'access_token': access_token}
-    post()

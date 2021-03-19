@@ -175,9 +175,7 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required, minLength, email, sameAs } from "vuelidate/lib/validators";
-
 import Api from "../axios";
-
 export default {
   mixins: [validationMixin],
   name: "signComponent",
@@ -233,7 +231,6 @@ export default {
         this.$v.form.$reset();
       });
     },
-
     toSignUp() {
       if (this.signIn) {
         this.signIn = false;
@@ -255,16 +252,13 @@ export default {
         this.$v.form.$touch();
         if (!this.$v.form.$error) {
           this.loading = true;
-
           Api.post("/auth/signup", {
             login: this.form.login,
             email: this.form.email,
             password: this.form.password,
             birthday: this.form.date
           })
-
             .then(data => {
-              console.log(data.data);
               this.loading = false;
               this.$router.push({ path: "/library" });
             })
@@ -278,20 +272,18 @@ export default {
         this.$v.form.password.$touch();
         if (!this.$v.form.email.$error && !this.form.password.$error) {
           this.loading = true;
-
           Api.post("/auth/signin", {
             email: this.form.email,
             password: this.form.password
           })
-
             .then(data => {
-              console.log(data.data);
+              this.$store.dispatch("userModule/loginUser", data.data);
               this.loading = false;
               this.$router.push({ path: "/library" });
             })
             .catch(err => {
-              this.resetErrorMessage(err.response.data.message);
               this.loading = false;
+              this.resetErrorMessage(err.response.data.message);
             });
         }
       }
@@ -393,7 +385,6 @@ export default {
     .form-control {
       margin-top: 10px;
     }
-
     .logo {
       margin: 0 5px 15px 0px;
     }

@@ -6,6 +6,7 @@ import Header from "../components/header";
 import booksPage from "../pages/booksPage";
 import downloadPage from "../pages/downloadPage";
 import profilePage from "../pages/proflePage";
+import store from "../store/index";
 
 Vue.use(Router);
 
@@ -16,21 +17,25 @@ const headerComponent = name => {
 const routes = [
   {
     path: "/library",
+    meta: { auth: true },
     component: libraryPage,
     children: [headerComponent("libraryPage")]
   },
   {
     path: "/profile",
+    meta: { auth: true },
     component: profilePage,
     children: [headerComponent("profilePage")]
   },
   {
     path: "/books",
+    meta: { auth: true },
     component: booksPage,
     children: [headerComponent("booksPage")]
   },
   {
     path: "/download",
+    meta: { auth: true },
     component: downloadPage,
     children: [headerComponent("downloadPage")]
   },
@@ -53,8 +58,21 @@ const routes = [
   }
 ];
 
-export default new Router({
+const rout = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes
 });
+
+rout.beforeEach((to, from, next) => {
+  const currentUser = store.getters["userModule/getToken"];
+  const requireAuth = to.matched.some(record => record.meta.auth);
+
+  if (requireAuth && !currentUser) {
+    next("/signin");
+  } else {
+    next();
+  }
+  next();
+});
+export default rout;

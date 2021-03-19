@@ -1,6 +1,5 @@
 from app import db
 
-
 class Login(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     email=db.Column(db.String(100),unique=True,nullable=False)
@@ -47,7 +46,8 @@ class Login(db.Model):
         except:
             return {'message':'something went wrong'}
 
-class RevokedTokenModel(db.Model):
+
+class Revokedtokenmodel(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     jti=db.Column(db.String(120))
 
@@ -55,9 +55,9 @@ class RevokedTokenModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @staticmethod
+    @classmethod
     def is_jti_blacklisted(cls,jti):
-        query=cls.query.filter(cls.jti==jti).first()
+        query=cls.query.filter(Revokedtokenmodel.jti==jti).first()
         return bool(query)
 
 

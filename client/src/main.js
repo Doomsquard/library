@@ -6,6 +6,7 @@ import router from "./router";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import Vuelidate from "vuelidate";
 
+import store from "./store/index";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "./assets/scss/index.scss";
@@ -18,9 +19,12 @@ Vue.use(IconsPlugin);
 
 Vue.use(Vuelidate);
 
+Vue.use(store);
+
 new Vue({
   el: "#app",
   router,
+  store,
   components: { App },
   template: "<App/>"
 });

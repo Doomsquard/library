@@ -20,10 +20,19 @@
 
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item v-for="(book, index) in buttons" :key="book + index">
+            <b-nav-item
+              @click="check"
+              v-for="(book, index) in buttons"
+              :key="book + index"
+            >
               <router-link :to="{ name: book.name }" class="button__link">{{
                 book.text
               }}</router-link>
+            </b-nav-item>
+            <b-nav-item @click="logoutHandler">
+              <router-link :to="{ name: 'signInPage' }" class="button__link"
+                >Logout</router-link
+              >
             </b-nav-item>
           </b-navbar-nav>
         </b-collapse>
@@ -53,14 +62,18 @@ export default {
         {
           name: "downloadPage",
           text: "Download"
-        },
-
-        {
-          name: "signInPage",
-          text: "Logout"
         }
       ]
     };
+  },
+  methods: {
+    check() {
+      this.$store.dispatch("userModule/checkToken");
+    },
+    logoutHandler() {
+      this.$store.dispatch("userModule/logoutUser");
+      this.$router.push({ name: "signInPage" });
+    }
   }
 };
 </script>
