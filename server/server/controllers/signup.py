@@ -1,4 +1,4 @@
-import hashPas
+import server.hashPas as hashPas
 import datetime
 
 from flask_jwt_extended import (
@@ -16,7 +16,6 @@ def signUp(Users,Login,Booksprofile,request,make_response,db):
     hashPassword=hashPas.hash(request.json["password"]).decode('utf-8')
     dateReg=datetime.datetime.now()
 
-    print(Booksprofile.query.all(),Login)
     login=Login(email=currentEmail,hash=hashPassword,datereg=dateReg,lastlog=dateReg,entries=1)
     user=Users(login=currentLogin,email=currentEmail,birthday=request.json['birthday'])
     booksUser=Booksprofile(login=currentLogin,favbooks=[''],favgenre=[''],wantread=0,readed=0)

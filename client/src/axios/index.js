@@ -1,6 +1,5 @@
 import axios from "axios";
 import store from "../store/index";
-import jwt_decode from "jwt-decode";
 import { getCookieByName } from "../cookies/methods";
 
 const instance = axios.create({
@@ -8,18 +7,21 @@ const instance = axios.create({
   headers: { "Access-Control-Allow-Origin": "*" }
 });
 
-instance.interceptors.request.use(request => {
-  console.log(request);
-  if (request.url === "/token/refresh") {
-    const currentToken = getCookieByName("jwtRefresh");
-    store.dispatch["userModule/checkToken"];
-    request.headers["Authorization"] = `Bearer ${currentToken}`;
-    return request;
+instance.interceptors.request.use(async request => {
+  let currentToken = null;
+  if (request.url === "/token/refresh" || request.url === "/logout/refresh") {
+    // currentToken = getCookieByName("jwtRefresh");
+    currentToken =
+      store.getters["userModule/getRefreshToken"] ||
+      getCookieByName("jwtRefresh");
   } else {
-    const currentToken = store.getters["userModule/getToken"];
-    request.headers["Authorization"] = `Bearer ${currentToken}`;
-    return request;
+    currentToken = store.getters["userModule/getToken"];
   }
+  await store.dispatch["userModule/checkToken"];
+
+  request.headers["Authorization"] = `Bearer ${currentToken}`;
+
+  return request;
 });
 
 export default instance;

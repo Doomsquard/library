@@ -29,6 +29,7 @@ export default {
     },
     LOGOUT_USER(state) {
       state.token = null;
+      state.refreshToken = null;
     },
     SET_NEW_TOKEN(state, payload) {
       state.token = payload.newToken;
@@ -38,27 +39,32 @@ export default {
     checkToken(context, payload) {
       const jwtTime = +(jwt_decode(context.state.token).exp + "000");
 
-      if (jwtTime - Date.now() < 10000) {
-        Api.post("/token/refresh")
-          .then(data => {
-            context.commit("SET_NEW_TOKEN", {
-              newToken: data.data.access_token
-            });
-          })
-          .catch(() => {
-            router.push({ name: "signInPage" });
-            localStorage.removeItem("access_token");
-            deleteCookie("jwtRefresh");
+      // if (jwtTime - Date.now() < 10000) {
+      Api.post("/token/refresh")
+        .then(data => {
+          const newToken = data.data.access_token;
+          localStorage.setItem("access_token", newToken);
+          context.commit("SET_NEW_TOKEN", {
+            newToken
           });
-      }
+        })
+        .catch(() => {
+          router.push({ name: "signInPage" });
+          localStorage.removeItem("access_token");
+          deleteCookie("jwtRefresh");
+        });
+      //}
     },
     loginUser({ commit }, payload) {
       const { user, access_token, refresh_token } = payload;
       localStorage.setItem("access_token", access_token);
-      setCookie("jwtRefresh", `${refresh_token}`, {
-        secure: true,
-        "max-age": 3600 * 24 * 5
-      });
+      getCookieByName("jwtRefresh")
+        ? null
+        : setCookie("jwtRefresh", `${refresh_token}`, {
+            secure: true,
+            "max-age": 3600 * 24 * 5
+          });
+
       commit("SET_USER", {
         user,
         token: access_token,
@@ -69,16 +75,15 @@ export default {
       Api.post("/logout/access")
         .then(() => {
           localStorage.removeItem("access_token");
-          deleteCookie("jwtRefresh");
-          context.commit("LOGOUT_USER");
         })
-        .catch(err => console.error(err));
-      Api.post("/logout/refresh")
-        .then(() => {
-          localStorage.removeItem("access_token");
-          deleteCookie("jwtRefresh");
-          context.commit("LOGOUT_USER");
-        })
+        .catch(err => console.error(err))
+        .then(
+          Api.post("/logout/refresh").then(() => {
+            deleteCookie("jwtRefresh");
+            context.commit("LOGOUT_USER");
+          })
+        )
+
         .catch(err => console.error(err));
     }
   }

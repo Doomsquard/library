@@ -2,15 +2,17 @@
   <div class="profilePage">
     <router-view></router-view>
     <profile-component />
+    <error-msg />
   </div>
 </template>
 
 <script>
 import ProfileComponent from "../components/profileComponent.vue";
+import ErrorMsg from "../components/errorMsg.vue";
 
 export default {
   name: "profilePage",
-  components: { ProfileComponent }
+  components: { ProfileComponent, ErrorMsg }
 };
 </script>
 

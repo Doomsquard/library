@@ -13,7 +13,7 @@
           width="50px"
           alt="logo"
         />
-        <h1 class="h3 mb-3 fw-normal">BrainLibrary</h1>
+        <h1 class="h3 mb-3 fw-normal">Your Library</h1>
       </div>
 
       <input
@@ -138,19 +138,6 @@
         {{ dateError.errorMessage }}
       </b-form-text>
 
-      <div class="checkbox mb-3" v-if="!loading" v-show="signIn">
-        <label>
-          <input type="checkbox" v-model="form.remember" /> Remember me
-        </label>
-      </div>
-
-      <b-skeleton
-        v-else
-        v-show="!signIn"
-        type="input"
-        class="form-control"
-      ></b-skeleton>
-
       <button
         :disabled="isloading"
         class="w-100 btn btn-lg btn-primary m-2"
@@ -174,6 +161,7 @@
 
 <script>
 import { validationMixin } from "vuelidate";
+import { deleteCookie } from "../cookies/methods";
 import { required, minLength, email, sameAs } from "vuelidate/lib/validators";
 import Api from "../axios";
 export default {
@@ -189,8 +177,7 @@ export default {
         samePassword: "",
         login: "",
         date: "",
-        error: "",
-        remember: false
+        error: ""
       }
     };
   },
@@ -366,6 +353,10 @@ export default {
     regText() {
       return this.signIn ? "not registered yet?" : "already registered?";
     }
+  },
+  mounted() {
+    localStorage.removeItem("access_token");
+    deleteCookie("jwtRefresh");
   }
 };
 </script>

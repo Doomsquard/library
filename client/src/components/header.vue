@@ -11,7 +11,7 @@
               alt="logo"
             />
             <p class="header__title">
-              BrainLibrary
+              Your Library
             </p>
           </router-link></b-navbar-brand
         >
@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { deleteCookie } from "../cookies/methods";
 export default {
   name: "headerComponent",
   data() {
@@ -72,6 +73,8 @@ export default {
     },
     logoutHandler() {
       this.$store.dispatch("userModule/logoutUser");
+      localStorage.removeItem("access_token");
+      deleteCookie("jwtRefresh");
       this.$router.push({ name: "signInPage" });
     }
   }
@@ -106,6 +109,7 @@ export default {
 
 .button__link {
   text-decoration: none;
+  z-index: 99;
   color: black;
   &:hover {
     text-decoration: none;

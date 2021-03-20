@@ -67,8 +67,7 @@ const rout = new Router({
 rout.beforeEach((to, from, next) => {
   const currentUser = store.getters["userModule/getToken"];
   const requireAuth = to.matched.some(record => record.meta.auth);
-
-  if (requireAuth && !currentUser) {
+  if (requireAuth && !currentUser && rout.history.current.path !== "/signin") {
     next("/signin");
   } else {
     next();

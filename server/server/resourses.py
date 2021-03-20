@@ -1,13 +1,11 @@
 from flask import request, jsonify, make_response
-from flask_jwt_extended import (
-jwt_required,get_raw_jwt,jwt_refresh_token_required,get_jwt_identity,create_access_token
-)
 
-from app import app, db
 
-import controllers.signup as sign_up
-import controllers.signin as sign_in
-import models.models as models
+from server import db
+
+from server.controllers import signup as sign_up
+from server.controllers import signin as sign_in
+from server.models import models
 
 
 def initial():
