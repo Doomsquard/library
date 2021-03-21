@@ -39,21 +39,21 @@ export default {
     checkToken(context, payload) {
       const jwtTime = +(jwt_decode(context.state.token).exp + "000");
 
-      // if (jwtTime - Date.now() < 10000) {
-      Api.post("/token/refresh")
-        .then(data => {
-          const newToken = data.data.access_token;
-          localStorage.setItem("access_token", newToken);
-          context.commit("SET_NEW_TOKEN", {
-            newToken
+      if (jwtTime - Date.now() < 10000) {
+        Api.post("/token/refresh")
+          .then(data => {
+            const newToken = data.data.access_token;
+            localStorage.setItem("access_token", newToken);
+            context.commit("SET_NEW_TOKEN", {
+              newToken
+            });
+          })
+          .catch(() => {
+            router.push({ name: "signInPage" });
+            localStorage.removeItem("access_token");
+            deleteCookie("jwtRefresh");
           });
-        })
-        .catch(() => {
-          router.push({ name: "signInPage" });
-          localStorage.removeItem("access_token");
-          deleteCookie("jwtRefresh");
-        });
-      //}
+      }
     },
     loginUser({ commit }, payload) {
       const { user, access_token, refresh_token } = payload;

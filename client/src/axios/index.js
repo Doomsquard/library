@@ -10,14 +10,13 @@ const instance = axios.create({
 instance.interceptors.request.use(async request => {
   let currentToken = null;
   if (request.url === "/token/refresh" || request.url === "/logout/refresh") {
-    // currentToken = getCookieByName("jwtRefresh");
     currentToken =
-      store.getters["userModule/getRefreshToken"] ||
+      store.getters["tokenModule/getRefreshToken"] ||
       getCookieByName("jwtRefresh");
   } else {
-    currentToken = store.getters["userModule/getToken"];
+    currentToken = store.getters["tokenModule/getToken"];
   }
-  await store.dispatch["userModule/checkToken"];
+  await store.dispatch["tokenModule/checkToken"];
 
   request.headers["Authorization"] = `Bearer ${currentToken}`;
 

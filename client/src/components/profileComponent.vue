@@ -50,7 +50,7 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch["userModule/checkToken"];
+    this.$store.dispatch["tokenModule/checkToken"];
   },
   mounted() {
     if (!this.$store.getters["profileModule/checkUser"]) {
@@ -70,7 +70,7 @@ export default {
           this.readed = currentProfileState.readed;
           this.birthday = new Date(currentProfileState.birthday);
         })
-        .catch(() => {
+        .catch(async () => {
           this.$store.dispatch("setError", "some problems with data,try again");
         })
         .finally(() => (this.loading = false));

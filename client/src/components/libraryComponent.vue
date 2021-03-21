@@ -10,11 +10,6 @@ import Header from "./header";
 export default {
   name: "libraryComponent",
   components: { Header }
-  // created() {
-  //   !localStorage.getItem("auth")
-  //     ? this.$router.push({ path: "/signin" })
-  //     : null;
-  // }
 };
 </script>
 

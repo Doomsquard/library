@@ -1,12 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import userModule from "./userModule";
+import tokenModule from "./tokenModule";
 import profileModule from "./profileModule";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  modules: { userModule, profileModule },
+  modules: { tokenModule, profileModule },
   state: {
     errorMsg: ""
   },

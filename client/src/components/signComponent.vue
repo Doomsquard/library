@@ -245,7 +245,7 @@ export default {
             password: this.form.password,
             birthday: this.form.date
           })
-            .then(data => {
+            .then(() => {
               this.loading = false;
               this.$router.push({ path: "/library" });
             })
@@ -264,7 +264,7 @@ export default {
             password: this.form.password
           })
             .then(data => {
-              this.$store.dispatch("userModule/loginUser", data.data);
+              this.$store.dispatch("tokenModule/loginUser", data.data);
               this.loading = false;
               this.$router.push({ path: "/library" });
             })

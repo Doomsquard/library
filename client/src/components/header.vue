@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-white">
+  <nav class="navbar headerComponent navbar-expand-lg navbar-light bg-white">
     <div class="container d-flex justify-content-between">
       <b-navbar toggleable="lg">
         <b-navbar-brand href="#"
@@ -69,10 +69,10 @@ export default {
   },
   methods: {
     check() {
-      this.$store.dispatch("userModule/checkToken");
+      this.$store.dispatch("tokenModule/checkToken");
     },
     logoutHandler() {
-      this.$store.dispatch("userModule/logoutUser");
+      this.$store.dispatch("tokenModule/logoutUser");
       localStorage.removeItem("access_token");
       deleteCookie("jwtRefresh");
       this.$router.push({ name: "signInPage" });
@@ -81,15 +81,31 @@ export default {
 };
 </script>
 
+<style lang="scss" scoped></style>
+
 <style lang="scss" scoped>
-.header {
+.headerComponent {
+  z-index: 99;
   &__title {
     font-size: 1.5rem;
   }
 }
-</style>
+.headerComponent::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 4px;
+  background: linear-gradient(
+    180deg,
+    rgba(9, 30, 66, 0.13) 0,
+    rgba(9, 30, 66, 0.13) 1px,
+    rgba(9, 30, 66, 0.08) 1px,
+    rgba(9, 30, 66, 0) 4px
+  );
+}
 
-<style lang="scss" scoped>
 .navbar-expand-lg {
   min-width: 100%;
 }
