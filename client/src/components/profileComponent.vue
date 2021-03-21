@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper container">
-    <!-- <div class="loading container"></div> -->
-    <div>
+    <loader v-if="loading" />
+    <div v-else>
       <div class="container mt-5 d-flex justify-content-center">
         <div class="card p-3">
           <div class="d-flex align-items-center">
@@ -28,20 +28,37 @@
           </div>
         </div>
       </div>
+      <div class="bookList__wrapper">
+        <books-list
+          title="FAVORIT BOOKS"
+          :list="favbooks"
+          currentId="1"
+          place="book"
+        />
+        <books-list
+          title="FAVORIT GENRE"
+          :list="favgenre"
+          currentId="2"
+          place="genre"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Api from "../axios/index";
+import booksList from "./booksList.vue";
+import loader from "./loader.vue";
 
 export default {
+  components: { booksList, loader },
   name: "profileComponent",
   data() {
     return {
       login: "",
-      favbooks: "",
-      favgenre: "",
+      favbooks: [],
+      favgenre: [],
       wantRead: "",
       readed: "",
       birthday: "",
@@ -63,6 +80,7 @@ export default {
           const currentProfileState = this.$store.getters[
             "profileModule/getInfo"
           ];
+
           this.login = currentProfileState.login;
           this.favbooks = currentProfileState.favbooks;
           this.favgenre = currentProfileState.favgenre;
@@ -114,10 +132,16 @@ export default {
 
 <style lang="scss" scoped>
 .wrapper {
+  min-width: 100%;
   position: absolute;
   top: 0;
   left: 0;
   margin-top: 100px;
+}
+.bookList__wrapper {
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
 
 .card {
@@ -157,5 +181,12 @@ export default {
 
 .number3 {
   font-weight: 500;
+}
+
+@media screen and (max-width: 600px) {
+  .bookList__wrapper {
+    display: block;
+    margin: auto;
+  }
 }
 </style>

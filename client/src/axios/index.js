@@ -7,7 +7,7 @@ const instance = axios.create({
   headers: { "Access-Control-Allow-Origin": "*" }
 });
 
-instance.interceptors.request.use(async request => {
+instance.interceptors.request.use(request => {
   let currentToken = null;
   if (request.url === "/token/refresh" || request.url === "/logout/refresh") {
     currentToken =
@@ -16,7 +16,7 @@ instance.interceptors.request.use(async request => {
   } else {
     currentToken = store.getters["tokenModule/getToken"];
   }
-  await store.dispatch["tokenModule/checkToken"];
+  store.dispatch["tokenModule/checkToken"];
 
   request.headers["Authorization"] = `Bearer ${currentToken}`;
 

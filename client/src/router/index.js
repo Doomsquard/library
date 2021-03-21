@@ -64,11 +64,10 @@ const rout = new Router({
   routes
 });
 
-rout.beforeEach(async (to, from, next) => {
-  if (to.path !== "/signin") {
-    await store.dispatch("tokenModule/checkToken");
+rout.beforeEach((to, from, next) => {
+  if (to.name !== "signUpPage" && to.name !== "signInPage") {
+    store.dispatch("tokenModule/checkToken");
   }
-
   const currentUser = store.getters["tokenModule/getToken"];
   const requireAuth = to.matched.some(record => record.meta.auth);
   if (requireAuth && !currentUser && rout.history.current.path !== "/signin") {

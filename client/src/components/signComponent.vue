@@ -245,13 +245,14 @@ export default {
             password: this.form.password,
             birthday: this.form.date
           })
-            .then(() => {
+            .then(data => {
+              this.$store.dispatch("tokenModule/loginUser", data.data);
               this.loading = false;
               this.$router.push({ path: "/library" });
             })
             .catch(err => {
-              this.resetErrorMessage(err.response.data.message);
               this.loading = false;
+              this.resetErrorMessage(err.response.data.message);
             });
         }
       } else {
